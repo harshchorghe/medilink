@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { assets } from '../assets/assets';
 
 const NavBar = () => {
   const [profileDropdown, setProfileDropdown] = useState(false);
@@ -11,8 +10,8 @@ const NavBar = () => {
 
   return (
     <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 px-4 relative">
-      {/* Logo */}
-      <img className="w-44 cursor-pointer" src={assets.logo} alt="Logo" />
+      {/* App Title instead of Logo */}
+      <h1 className="text-4xl font-bold text-blue-600 cursor-pointer">APADOC</h1>
 
       {/* Navigation links */}
       <ul className="flex space-x-6 font-medium text-gray-700">
@@ -20,8 +19,8 @@ const NavBar = () => {
           <li className="hover:text-blue-500 cursor-pointer">Home</li>
         </NavLink>
         <NavLink to="/doctors" activeClassName="text-blue-600">
-  <li className="hover:text-blue-500 cursor-pointer">All Doctors</li>
-</NavLink>
+          <li className="hover:text-blue-500 cursor-pointer">All Doctors</li>
+        </NavLink>
         <NavLink to="/about" activeClassName="text-blue-600">
           <li className="hover:text-blue-500 cursor-pointer">About</li>
         </NavLink>
@@ -33,7 +32,7 @@ const NavBar = () => {
       {/* Profile Image & Dropdown */}
       <div className="relative">
         <img
-          src={assets.upload_area}
+          src="/path/to/profile.png" // replace with your profile image if needed
           alt="Profile"
           className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300"
           onClick={toggleDropdown}

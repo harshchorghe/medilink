@@ -15,21 +15,21 @@ const About = () => {
           />
           <div>
             <p className="mb-4">
-              Welcome to Prescripto, Your Trusted Partner for Managing Your
-              Healthcare Needs Conveniently And Efficiently. At Prescripto, We
+              Welcome to Apadoc, Your Trusted Partner for Managing Your
+              Healthcare Needs Conveniently And Efficiently. At Apadoc, We
               Understand That Choosing the Right Doctor and When to Visit Can
               Be a Struggle. Doctor Appointments and Managing Your Health
               Records.
             </p>
             <p className="mb-4">
-              Prescripto Is Committed to Excellence in Healthcare. We
+              Apadoc Is Committed to Excellence in Healthcare. We
               Continuously Strive to Enhance Our Services, Offering a
               Simplified Tool For Your Appointment and to Manage Ongoing Care.
-              Prescripto Is Here to Support You Every Step Of The Way.
+              Apadoc Is Here to Support You Every Step Of The Way.
             </p>
             <p>
               <strong>Our Vision</strong><br />
-              Our Vision At Prescripto Is to Create A Seamless Healthcare
+              Our Vision At Apadoc Is to Create A Seamless Healthcare
               Experience For Every User. We Aim To Bridge The Gap Between
               Patients And Healthcare Providers, Making It Easier For You to
               Access The Care You Need, When You Need It.

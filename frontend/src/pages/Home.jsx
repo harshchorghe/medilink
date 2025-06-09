@@ -11,7 +11,7 @@ const Home = () => {
           <h1 className="text-4xl font-bold mb-4">Your Health, Our Priority</h1>
           <p className="text-gray-600 mb-6">
             Find and book appointments with the best doctors in your area. 
-            Get the care you deserve with MediLink.
+            Get the care you deserve with Apadoc.
           </p>
           <Link to="/doctors">
             <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md">
