@@ -4,37 +4,44 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Appointment = () => {
+  // Getting the doctor ID from URL params
   const { id } = useParams();
+
+  // Getting state passed through navigation (if available)
   const location = useLocation();
   const locationDoctor = location.state;
 
-  const [doctor, setDoctor] = useState(null);
-  const [selectedDay, setSelectedDay] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
+  // State variables
+  const [doctor, setDoctor] = useState(null);            // Stores selected doctor's details
+  const [selectedDay, setSelectedDay] = useState('');    // Stores selected day
+  const [selectedTime, setSelectedTime] = useState('');  // Stores selected time slot
 
+  // Options for appointment selection
   const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   const timeSlots = ['10:00AM', '11:00AM', '12:00PM', '01:00PM', '02:00PM'];
 
+  // Load doctor info from navigation state or localStorage
   useEffect(() => {
     if (locationDoctor) {
+      // If doctor data was passed during navigation
       setDoctor(locationDoctor);
-      localStorage.setItem('selectedDoctor', JSON.stringify(locationDoctor));
+      localStorage.setItem('selectedDoctor', JSON.stringify(locationDoctor)); // Save to localStorage
     } else {
+      // Fallback: Load doctor from localStorage
       const stored = JSON.parse(localStorage.getItem('selectedDoctor'));
       if (stored) setDoctor(stored);
     }
   }, [locationDoctor]);
 
-  if (!doctor) {
-    return <p style={{ padding: '2rem', textAlign: 'center' }}>Doctor not found or missing data.</p>;
-  }
-
+  // Booking logic
   const handleBookAppointment = () => {
+    // Validation: Day and Time must be selected
     if (!selectedDay || !selectedTime) {
       toast.error('Please select both day and time slot');
       return;
     }
 
+    // Creating appointment object
     const appointment = {
       doctorId: id,
       doctorName: doctor.name,
@@ -42,41 +49,45 @@ const Appointment = () => {
       image: doctor.image,
       day: selectedDay,
       time: selectedTime,
-      bookedAt: new Date().toLocaleString(),
+      bookedAt: new Date().toLocaleString(), // Stores booking time
     };
 
+    // Fetch existing appointments from localStorage and add the new one
     const existing = JSON.parse(localStorage.getItem('appointments')) || [];
     localStorage.setItem('appointments', JSON.stringify([...existing, appointment]));
 
+    // Show success message and reset selections
     toast.success('Appointment booked successfully!');
     setSelectedDay('');
     setSelectedTime('');
   };
 
+  // Handle if doctor is not found
+  if (!doctor) {
+    return (
+      <div className="text-center py-20 text-lg font-medium text-gray-600">
+        Doctor not found or missing data.
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
+    <div className="p-6 max-w-4xl mx-auto font-sans">
+      {/* Toast Container for notifications */}
       <ToastContainer />
 
-      <div style={{
-        display: 'flex',
-        gap: '20px',
-        marginBottom: '2rem',
-        border: '1px solid #ccc',
-        borderRadius: '10px',
-        padding: '1rem'
-      }}>
+      {/* Doctor Profile Section */}
+      <div className="flex flex-col md:flex-row gap-6 mb-8 border border-gray-300 rounded-xl p-6 shadow-md bg-white">
         <img
           src={doctor.image}
           alt={doctor.name}
-          style={{
-            width: '180px',
-            height: '180px',
-            borderRadius: '10px',
-            objectFit: 'cover'
-          }}
+          className="w-48 h-48 object-cover rounded-xl"
         />
-        <div>
-          <h2>{doctor.name} <span style={{ color: 'green' }}>✔️</span></h2>
+        <div className="flex-1 space-y-2">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            {doctor.name} <span className="text-green-500">✔️</span>
+          </h2>
+          {/* Doctor details */}
           <p><strong>Speciality:</strong> {doctor.speciality}</p>
           <p><strong>About:</strong> {doctor.about || "This doctor is highly experienced in their field."}</p>
           <p><strong>Experience:</strong> {doctor.experience || "5+ years"}</p>
@@ -84,58 +95,51 @@ const Appointment = () => {
         </div>
       </div>
 
-      <div>
-        <h3 style={{ marginBottom: '10px' }}>Select a Day</h3>
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
-          {days.map((day, index) => (
+      {/* Day Selection Section */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-2">Select a Day</h3>
+        <div className="flex flex-wrap gap-3">
+          {days.map((day, i) => (
             <button
-              key={index}
+              key={i}
               onClick={() => setSelectedDay(day)}
-              style={{
-                padding: '10px 15px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-                backgroundColor: selectedDay === day ? '#4CAF50' : '#f2f2f2',
-                color: selectedDay === day ? '#fff' : '#000',
-                cursor: 'pointer'
-              }}
+              className={`px-4 py-2 rounded-lg border transition-all ${
+                selectedDay === day
+                  ? 'bg-green-500 text-white border-green-600'
+                  : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+              }`}
             >
               {day}
             </button>
           ))}
         </div>
+      </div>
 
-        <h3 style={{ marginBottom: '10px' }}>Select a Time</h3>
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
-          {timeSlots.map((slot, index) => (
+      {/* Time Slot Selection Section */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-2">Select a Time</h3>
+        <div className="flex flex-wrap gap-3">
+          {timeSlots.map((slot, i) => (
             <button
-              key={index}
+              key={i}
               onClick={() => setSelectedTime(slot)}
-              style={{
-                padding: '10px 15px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-                backgroundColor: selectedTime === slot ? '#4CAF50' : '#f2f2f2',
-                color: selectedTime === slot ? '#fff' : '#000',
-                cursor: 'pointer'
-              }}
+              className={`px-4 py-2 rounded-lg border transition-all ${
+                selectedTime === slot
+                  ? 'bg-green-500 text-white border-green-600'
+                  : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+              }`}
             >
               {slot}
             </button>
           ))}
         </div>
+      </div>
 
+      {/* Book Appointment Button */}
+      <div className="text-center">
         <button
           onClick={handleBookAppointment}
-          style={{
-            padding: '12px 20px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '5px',
-            fontSize: '16px',
-            cursor: 'pointer'
-          }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium text-lg transition-all"
         >
           Book Appointment
         </button>

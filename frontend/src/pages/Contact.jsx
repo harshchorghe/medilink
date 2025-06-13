@@ -1,18 +1,25 @@
-import React from 'react'
-import { assets } from '../assets/assets'
+import React from 'react';
+import { assets } from '../assets/assets';
 
 const Contact = () => {
   return (
     <div className="py-10">
+      {/* Page Heading */}
       <h1 className="text-3xl font-bold text-center mb-10">Contact Us</h1>
       
+      {/* Layout: Image and Form side by side on medium+ screens, stacked on small */}
       <div className="flex flex-col md:flex-row gap-10 items-center">
+
+        {/* Contact Illustration Image */}
         <div className="w-full md:w-1/2">
           <img src={assets.contact_image} alt="Contact" className="w-full rounded-lg" />
         </div>
-        
+
+        {/* Contact Form Section */}
         <div className="w-full md:w-1/2">
           <form className="space-y-4">
+            
+            {/* Name Input Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
               <input
@@ -22,7 +29,8 @@ const Contact = () => {
                 placeholder="Your name"
               />
             </div>
-            
+
+            {/* Email Input Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
               <input
@@ -32,7 +40,8 @@ const Contact = () => {
                 placeholder="Your email"
               />
             </div>
-            
+
+            {/* Message Text Area */}
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
               <textarea
@@ -42,7 +51,8 @@ const Contact = () => {
                 placeholder="Your message"
               ></textarea>
             </div>
-            
+
+            {/* Submit Button */}
             <button
               type="submit"
               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -53,7 +63,7 @@ const Contact = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Contact
+export default Contact;

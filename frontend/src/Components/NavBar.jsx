@@ -29,41 +29,52 @@ const NavBar = () => {
         </NavLink>
       </ul>
 
-      {/* Profile Image & Dropdown */}
-      <div className="relative">
-        <img
-          src="/path/to/profile.png" // replace with your profile image if needed
-          alt="Profile"
-          className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300"
-          onClick={toggleDropdown}
-        />
-        {profileDropdown && (
-          <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-md py-2 z-50">
-            <NavLink
-              to="/myprofile"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => setProfileDropdown(false)}
-            >
-              My Profile
-            </NavLink>
-            <NavLink
-              to="/appointments"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => setProfileDropdown(false)}
-            >
-              My Appointments
-            </NavLink>
-            <button
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => {
-                setProfileDropdown(false);
-                // TODO: Add logout logic here
-              }}
-            >
-              Logout
-            </button>
-          </div>
-        )}
+      {/* Right side: Create Account + Profile */}
+      <div className="flex items-center space-x-4">
+        {/* Create Account Button */}
+        <NavLink
+          to="/signup"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+        >
+          Create Account
+        </NavLink>
+
+        {/* Profile Image & Dropdown */}
+        <div className="relative">
+          <img
+            src="/path/to/profile.png" // replace with your profile image
+            alt="Profile"
+            className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300"
+            onClick={toggleDropdown}
+          />
+          {profileDropdown && (
+            <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-md py-2 z-50">
+              <NavLink
+                to="/myprofile"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => setProfileDropdown(false)}
+              >
+                My Profile
+              </NavLink>
+              <NavLink
+                to="/appointments"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => setProfileDropdown(false)}
+              >
+                My Appointments
+              </NavLink>
+              <button
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => {
+                  setProfileDropdown(false);
+                  // TODO: Add logout logic here
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
