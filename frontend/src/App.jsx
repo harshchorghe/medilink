@@ -1,38 +1,58 @@
-import React, { useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext'; // Import the AuthContext
+import React from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 
-import NavBar from './Components/NavBar';
+// Layouts
+import LandingLayout from './Layouts/LandingLayout';
+import PatientLayout from './Layouts/PatientLayout';
+
+// Public Pages
 import Home from './pages/home';
-import Doctors from './pages/doctors';
-import Login from './pages/login';
+import Login from './pages/Login';
 import Signup from './pages/signup';
 import About from './pages/about';
-import MyProfile from './pages/myProfile';
 import Contact from './pages/Contact';
+
+// App Pages
+import MyProfile from './pages/myProfile';
 import MyAppointments from './pages/MyAppointments';
 import Appointment from './pages/appointment';
+import Doctors from './pages/doctors';
+import PatientMainScreen from './pages/PatientMainScreen';
+import DashBoard from './DoctorsPages/DashBoard';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <LandingLayout />,
+    children: [
+      { path: '/', element: <Home /> },
+      { path: 'login', element: <Login /> },
+      { path: 'signup', element: <Signup /> },
+      { path: 'about', element: <About /> },
+      { path: 'contact', element: <Contact /> }
+    ]
+  },
+  {
+    path: '/',
+    element: <PatientLayout />,
+    children: [
+      { path: 'PatientMainScreen', element: <PatientMainScreen /> },
+      { path: 'doctors', element: <Doctors /> },
+      { path: 'doctors/:speciality', element: <Doctors /> },
+      { path: 'MyProfile', element: <MyProfile /> },
+      { path: 'appointments', element: <MyAppointments /> },
+      { path: 'appointment/:docId', element: <Appointment /> },
+      { path: 'doctorsDashboard', element: <DashBoard /> }
+    ]
+  }
+]);
 
 const App = () => {
   return (
-    <AuthProvider>
-      <div className="mx-4 sm:mx-[10%]">
-        <NavBar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/doctors" element={<Doctors />} />
-          <Route path="/doctors/:speciality" element={<Doctors />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/MyProfile" element={<MyProfile />} />
-          <Route path="/appointments" element={<MyAppointments />} />
-          <Route path="/appointment/:docId" element={<Appointment />} />
-          {/* <Route path="/doctorsdashboard" element={<DoctorsDashboard />} /> */}
-        </Routes>
-      </div>
-    </AuthProvider>
+    
+      <RouterProvider router={router} />
+    
   );
 };
 

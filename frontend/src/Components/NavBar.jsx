@@ -15,7 +15,7 @@ const NavBar = () => {
 
       {/* Navigation links */}
       <ul className="flex space-x-6 font-medium text-gray-700">
-        <NavLink to="/" activeClassName="text-blue-600">
+        <NavLink to="/patient-dashboard" activeClassName="text-blue-600">
           <li className="hover:text-blue-500 cursor-pointer">Home</li>
         </NavLink>
         <NavLink to="/doctors" activeClassName="text-blue-600">
@@ -32,12 +32,7 @@ const NavBar = () => {
       {/* Right side: Create Account + Profile */}
       <div className="flex items-center space-x-4">
         {/* Create Account Button */}
-        <NavLink
-          to="/signup"
-          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
-        >
-          Create Account
-        </NavLink>
+        
 
         {/* Profile Image & Dropdown */}
         <div className="relative">

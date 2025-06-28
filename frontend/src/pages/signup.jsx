@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const [role, setRole] = useState('patient');
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const initialRole = queryParams.get('role') || 'patient';
+
+  const [role, setRole] = useState(initialRole);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,7 +25,7 @@ const Signup = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -28,14 +33,43 @@ const Signup = () => {
       return;
     }
 
-    // TODO: Send formData to backend
-    console.log('Signup Data:', role, formData);
+    const payload = {
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      password: formData.password,
+      role: role.trim(),
+      phone: formData.phone,
+      ...(role === 'patient'
+        ? {
+            gender: formData.gender,
+            address: formData.address,
+          }
+        : {
+            speciality: formData.speciality,
+          }),
+    };
 
-    // Redirect to appropriate dashboard
-    if (role === 'patient') {
-      navigate('/');
-    } else {
-      navigate('/doctorsdashboard');
+    try {
+      const response = await fetch('http://localhost:5000/v1/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      console.log('Signup response:', data);
+
+      if (response.status === 201) {
+        alert('Signup successful! Please login.');
+        navigate('/login'); // ✅ Redirect to login page after successful signup
+      } else {
+        alert(data.message || 'Signup failed.');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('Something went wrong. Please try again.');
     }
   };
 
@@ -44,7 +78,6 @@ const Signup = () => {
       <div className="w-full max-w-md bg-white p-6 rounded shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-6">Create an Account</h2>
 
-        {/* Role selection */}
         <div className="flex justify-center mb-6 space-x-4">
           <button
             type="button"
@@ -66,7 +99,6 @@ const Signup = () => {
           </button>
         </div>
 
-        {/* Signup Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
@@ -77,7 +109,6 @@ const Signup = () => {
             className="w-full px-4 py-2 border rounded"
             required
           />
-
           <input
             type="email"
             name="email"
@@ -87,7 +118,6 @@ const Signup = () => {
             className="w-full px-4 py-2 border rounded"
             required
           />
-
           <input
             type="tel"
             name="phone"
@@ -97,7 +127,6 @@ const Signup = () => {
             className="w-full px-4 py-2 border rounded"
             required
           />
-
           {role === 'patient' ? (
             <>
               <select
@@ -112,7 +141,6 @@ const Signup = () => {
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
-
               <textarea
                 name="address"
                 placeholder="Address"
@@ -134,8 +162,6 @@ const Signup = () => {
               required
             />
           )}
-
-          {/* Password Fields */}
           <input
             type="password"
             name="password"
@@ -145,7 +171,6 @@ const Signup = () => {
             className="w-full px-4 py-2 border rounded"
             required
           />
-
           <input
             type="password"
             name="confirmPassword"
@@ -155,7 +180,6 @@ const Signup = () => {
             className="w-full px-4 py-2 border rounded"
             required
           />
-
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
