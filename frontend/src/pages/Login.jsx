@@ -35,14 +35,15 @@ const Login = ({ setIsLoggedIn }) => {
         localStorage.setItem('email', data.data.email);
 
         setIsLoggedIn(true);
-
+        alert('Login successful!');
+        
         // Redirect based on role
         if (role === 'admin') {
           navigate('/PatientMainScreen');
         } else if (role === 'doctor') {
-          navigate('/doctor-dashboard');
+          navigate('/doctorsDashboard');
         } else {
-          navigate('/patient-dashboard');
+          navigate('/signup');
         }
 
       } else {

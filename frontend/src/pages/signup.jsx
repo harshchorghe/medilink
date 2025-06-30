@@ -14,6 +14,7 @@ const Signup = () => {
     email: '',
     phone: '',
     gender: '',
+    role: '',
     address: '',
     speciality: '',
     password: '',
@@ -62,8 +63,15 @@ const Signup = () => {
       console.log('Signup response:', data);
 
       if (response.status === 201) {
-        alert('Signup successful! Please login.');
-        navigate('/login'); // ✅ Redirect to login page after successful signup
+        alert('Signup successful! OTP sent to your email.');
+
+        // ✅ Navigate to email-verification page with email & role in state
+        navigate('/email-verification', {
+          state: {
+            email: payload.email,
+            role: payload.role,
+          },
+        });
       } else {
         alert(data.message || 'Signup failed.');
       }
@@ -187,7 +195,6 @@ const Signup = () => {
             Sign Up
           </button>
         </form>
-
         <p className="text-sm text-center mt-4">
           Already have an account?{' '}
           <a href="/login" className="text-blue-600 hover:underline">

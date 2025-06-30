@@ -15,7 +15,7 @@ const NavBar = () => {
 
       {/* Navigation links */}
       <ul className="flex space-x-6 font-medium text-gray-700">
-        <NavLink to="/patient-dashboard" activeClassName="text-blue-600">
+        <NavLink to="/PatientMainScreen" activeClassName="text-blue-600">
           <li className="hover:text-blue-500 cursor-pointer">Home</li>
         </NavLink>
         <NavLink to="/doctors" activeClassName="text-blue-600">

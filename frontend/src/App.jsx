@@ -20,6 +20,7 @@ import Appointment from './pages/appointment';
 import Doctors from './pages/doctors';
 import PatientMainScreen from './pages/PatientMainScreen';
 import DashBoard from './DoctorsPages/DashBoard';
+import EmailVerificationPage from './pages/EmailVerificationPage';
 
 const router = createBrowserRouter([
   {
@@ -29,8 +30,7 @@ const router = createBrowserRouter([
       { path: '/', element: <Home /> },
       { path: 'login', element: <Login /> },
       { path: 'signup', element: <Signup /> },
-      { path: 'about', element: <About /> },
-      { path: 'contact', element: <Contact /> }
+      { path: 'email-verification', element: <EmailVerificationPage /> },
     ]
   },
   {
@@ -41,9 +41,17 @@ const router = createBrowserRouter([
       { path: 'doctors', element: <Doctors /> },
       { path: 'doctors/:speciality', element: <Doctors /> },
       { path: 'MyProfile', element: <MyProfile /> },
+       { path: 'about', element: <About /> },
+      { path: 'contact', element: <Contact /> },
       { path: 'appointments', element: <MyAppointments /> },
       { path: 'appointment/:docId', element: <Appointment /> },
-      { path: 'doctorsDashboard', element: <DashBoard /> }
+    ]
+  },
+  {
+    path: '/',
+    element: <PatientLayout />,
+    children: [
+      { path: 'doctorsDashboard', element: <DashBoard /> },
     ]
   }
 ]);

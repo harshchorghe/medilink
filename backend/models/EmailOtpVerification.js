@@ -1,14 +1,38 @@
-const mongoose = require("mongoose")
+// const mongoose = require("mongoose");
 
-const schema = new mongoose.Schema({
-    email: {
-        type: String, 
-        unique: true,
-        required: true
-    },
-    otp: {
-        type: String, 
-    }
-})
+// const OtpSchema = new mongoose.Schema({
+//   email: { type: String, required: true },
+//   otp: { type: String, required: true },
+//   createdAt: { type: Date, default: Date.now, expires: 300 } // expires in 5 minutes
+// });
 
-module.exports = mongoose.models.EmailOTP || mongoose.model("EmailOTP", schema);
+// // ✅ Prevent OverwriteModelError:
+// const OtpModel = mongoose.models.OtpModel || mongoose.model("OtpModel", OtpSchema);
+
+// module.exports = OtpModel;
+const mongoose = require('mongoose');
+
+const emailOtpVerificationSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  otp: {
+    type: String,
+    required: true
+  },
+  hashedPassword: {
+    type: String,
+    required: true
+  },
+  name: {
+    type: String
+  },
+  role: {
+    type: String
+  }
+}, { timestamps: true });
+
+const Otp = mongoose.models.Otp || mongoose.model('Otp', emailOtpVerificationSchema);
+module.exports = Otp;

@@ -36,7 +36,7 @@ const DashBoard = () => {
     <div className="flex min-h-screen bg-gray-50 text-gray-800 font-sans">
       {/* Sidebar */}
       <aside className="w-60 bg-white border-r shadow-sm">
-        <div className="px-6 py-4 text-lg font-bold">MediLink</div>
+        <div className="px-6 py-4 text-lg font-bold">APADOC</div>
         <nav className="flex flex-col gap-4 px-4 py-2">
           <a href="#" className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-100 text-blue-600 font-medium">
             <MdDashboard /> Dashboard
