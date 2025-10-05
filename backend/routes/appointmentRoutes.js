@@ -63,6 +63,9 @@ Router.get("/:role", verifyAccessToken, (req, res) => {
                 throw "not found"
             }
             return Appointment.find({ doctorId: new mongoose.Types.ObjectId(doctor._id) })
+            .populate("patientId")
+            .sort({ dateTime: -1 })
+            .exec()
         })
         .then(appts => {
             return res.status(200).json({

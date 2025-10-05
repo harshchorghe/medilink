@@ -12,6 +12,8 @@ import Login from './pages/Login';
 import Signup from './pages/signup';
 import About from './pages/about';
 import Contact from './pages/Contact';
+// import NormalLogin from './pages/auth/NormalLogin';
+// import NormalSignup from './pages/auth/NormalSignup';
 
 // App Pages
 import MyProfile from './pages/myProfile';
@@ -20,7 +22,6 @@ import Appointment from './pages/appointment';
 import Doctors from './pages/doctors';
 import PatientMainScreen from './pages/PatientMainScreen';
 import DashBoard from './DoctorsPages/DashBoard';
-import EmailVerificationPage from './pages/EmailVerificationPage';
 
 const router = createBrowserRouter([
   {
@@ -30,7 +31,7 @@ const router = createBrowserRouter([
       { path: '/', element: <Home /> },
       { path: 'login', element: <Login /> },
       { path: 'signup', element: <Signup /> },
-      { path: 'email-verification', element: <EmailVerificationPage /> },
+      // email verification removed
     ]
   },
   {
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
       { path: 'contact', element: <Contact /> },
       { path: 'appointments', element: <MyAppointments /> },
       { path: 'appointment/:docId', element: <Appointment /> },
+
     ]
   },
   {

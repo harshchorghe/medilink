@@ -179,16 +179,13 @@ const Router = require("express").Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const OtpModel = require("../models/EmailOtpVerification");
 const { verifyAccessToken } = require("../middlewares/authentication");
-const { sendMail } = require("../helper.js");
 
-// ✅ Signup Route with JWT generation and OTP email sending
+// Signup without OTP
 Router.post("/signup", async (req, res) => {
   const { name, email, password, role, gender, address, speciality } = req.body;
 
   try {
-    // ✅ Validate input
     if (!name || !email || !password || !role) {
       return res.status(400).json({
         message: "Missing required fields",
@@ -197,7 +194,6 @@ Router.post("/signup", async (req, res) => {
       });
     }
 
-    // ✅ Check if user already exists
     const existingUser = await User.findOne({ email, role });
     if (existingUser) {
       return res.status(409).json({
@@ -207,21 +203,11 @@ Router.post("/signup", async (req, res) => {
       });
     }
 
-    // ✅ Generate JWT token
-    const token = jwt.sign(
-      { email, role },
-      process.env.SECRET,
-      { expiresIn: "1h" }
-    );
-
-    // ✅ Create new user with verifiedEmail false
     const newUser = new User({
       name,
       email,
       password,
       role,
-      verifiedEmail: false,
-      accessToken: token,
       profile: {
         gender: role === "patient" ? gender : undefined,
         address: role === "patient" ? address : undefined,
@@ -230,40 +216,18 @@ Router.post("/signup", async (req, res) => {
     });
 
     const doc = await newUser.save();
-
-    // ✅ Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // ✅ Get hashed password to save with OTP
-    const hashedPassword = doc.password;
-
-    // ✅ Upsert OTP document
-    await OtpModel.findOneAndUpdate(
-      { email },
-      {
-        $set: {
-          email,
-          otp,
-          hashedPassword,
-          name,
-          role
-        }
-      },
-      { upsert: true, new: true, runValidators: true }
-    );
-
-    // ✅ Send OTP via email
-    await sendMail(email, "Verify Your Email", `Your OTP is ${otp}`);
-
-    // ✅ Send response with redirect hint
+    const payload = { email: doc.email, role: doc.role, _id: doc._id };
+    const token = jwt.sign(payload, process.env.SECRET || 'dev-secret', { expiresIn: "12h" });
     const userData = { ...doc._doc };
     delete userData.password;
 
     return res.status(201).json({
-      message: "Signup successful. OTP sent to email.",
+      message: "Signup successful",
       error: null,
-      data: userData,
-      redirectTo: "/email-verification" // ⬅️ frontend can use this to navigate
+      data: {
+        ...userData,
+        accessToken: token
+      }
     });
 
   } catch (error) {
@@ -276,44 +240,7 @@ Router.post("/signup", async (req, res) => {
   }
 });
 
-// ✅ Email Verification Route
-Router.post("/email-verify", async (req, res) => {
-  const { email, otp } = req.body;
-
-  try {
-    const otpDoc = await OtpModel.findOne({ email });
-
-    if (!otpDoc || otpDoc.otp !== otp) {
-      return res.status(400).json({
-        message: "Invalid or expired OTP",
-        error: "OTP Mismatch",
-        data: null
-      });
-    }
-
-    // ✅ Set verifiedEmail to true
-    await User.findOneAndUpdate({ email }, { verifiedEmail: true });
-
-    // ✅ Delete OTP doc after use
-    await OtpModel.deleteOne({ email });
-
-    return res.status(200).json({
-      message: "Email verified successfully",
-      error: null,
-      data: null
-    });
-
-  } catch (error) {
-    console.error("Email verification error:", error);
-    return res.status(500).json({
-      message: "Verification failed",
-      error: error.message || error,
-      data: null
-    });
-  }
-});
-
-// ✅ Login Route
+// Login without OTP gate
 Router.post("/login", async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -321,12 +248,11 @@ Router.post("/login", async (req, res) => {
     const user = await User.findOne({ email, role });
     if (!user) throw new Error("User not found");
 
-    if (!user.verifiedEmail) {
-      throw new Error("Please verify your email before logging in");
-    }
-
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new Error("Invalid password");
+
+    const payload = { email: user.email, role: user.role, _id: user._id };
+    const token = jwt.sign(payload, process.env.SECRET || 'dev-secret', { expiresIn: "12h" });
 
     const userData = { ...user._doc };
     delete userData.password;
@@ -336,7 +262,7 @@ Router.post("/login", async (req, res) => {
       error: null,
       data: {
         ...userData,
-        accessToken: user.accessToken
+        accessToken: token
       }
     });
 

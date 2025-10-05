@@ -1,37 +1,78 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FaUserMd, FaCalendarAlt, FaUser } from 'react-icons/fa';
 import { FiGrid, FiList, FiPlusCircle } from 'react-icons/fi';
 import { MdDashboard } from 'react-icons/md';
 
-const appointments = [
-  {
-    name: "Dr. Richard James",
-    date: "Booking on 24th July, 2024",
-    img: "https://randomuser.me/api/portraits/men/32.jpg", // Placeholder avatar
-  },
-  {
-    name: "Dr. Richard James",
-    date: "Booking on 24th July, 2024",
-    img: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    name: "Dr. Richard James",
-    date: "Booking on 24th July, 2024",
-    img: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    name: "Dr. Richard James",
-    date: "Booking on 24th July, 2024",
-    img: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    name: "Dr. Richard James",
-    date: "Booking on 24th July, 2024",
-    img: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-];
+const formatDateTime = (epochMs) => {
+  try {
+    const d = new Date(Number(epochMs));
+    return d.toLocaleString();
+  } catch (_) {
+    return '';
+  }
+};
 
 const DashBoard = () => {
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const token = useMemo(() => localStorage.getItem('token') || '', []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchAppointments = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('http://localhost:5000/v1/appointments/doctor', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token
+              ? { 'Authorization': `Bearer ${token}` }
+              : { 'x-dev-user-email': localStorage.getItem('email') || 'doctor@example.com', 'x-dev-user-role': 'doctor' }
+            )
+          },
+          signal: controller.signal
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          throw new Error(json?.error || json?.message || 'Failed to fetch appointments');
+        }
+        setAppointments(Array.isArray(json.data) ? json.data : []);
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          setError(e.message || 'Something went wrong');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAppointments();
+    return () => controller.abort();
+  }, [token]);
+
+  const updateStatus = async (appointmentId, status) => {
+    try {
+      const res = await fetch(`http://localhost:5000/v1/appointments/${appointmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status })
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json?.error || json?.message || 'Failed to update');
+      }
+      setAppointments(prev => prev.map(a => a._id === appointmentId ? json.data : a));
+    } catch (e) {
+      alert(e.message || 'Update failed');
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50 text-gray-800 font-sans">
       {/* Sidebar */}
@@ -60,21 +101,21 @@ const DashBoard = () => {
           <div className="bg-white p-4 rounded-xl shadow flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Doctors</p>
-              <h3 className="text-xl font-bold">14</h3>
+              <h3 className="text-xl font-bold">-</h3>
             </div>
             <FaUserMd className="text-blue-500 text-2xl" />
           </div>
           <div className="bg-white p-4 rounded-xl shadow flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Appointments</p>
-              <h3 className="text-xl font-bold">2</h3>
+              <h3 className="text-xl font-bold">{appointments.length}</h3>
             </div>
             <FaCalendarAlt className="text-purple-500 text-2xl" />
           </div>
           <div className="bg-white p-4 rounded-xl shadow flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Patients</p>
-              <h3 className="text-xl font-bold">5</h3>
+              <h3 className="text-xl font-bold">-</h3>
             </div>
             <FaUser className="text-green-500 text-2xl" />
           </div>
@@ -83,28 +124,57 @@ const DashBoard = () => {
         {/* Latest Appointments */}
         <div className="bg-white p-5 rounded-xl shadow">
           <h4 className="font-semibold text-md border-b pb-2 mb-4 flex items-center gap-2">
-            📋 Latest Appointment
+            📋 Latest Appointments
           </h4>
-          <ul className="space-y-4">
-            {appointments.map((appt, index) => (
-              <li key={index} className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <img
-                    src={appt.img}
-                    alt={appt.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <div>
-                    <p className="font-medium">{appt.name}</p>
-                    <p className="text-sm text-gray-500">{appt.date}</p>
+          {loading && (
+            <div className="text-sm text-gray-500">Loading appointments...</div>
+          )}
+          {!loading && error && (
+            <div className="text-sm text-red-500">{error}</div>
+          )}
+          {!loading && !error && (
+            <ul className="space-y-4">
+              {appointments.map((appt) => (
+                <li key={appt._id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={appt?.patientId?.avatar || 'https://i.pravatar.cc/100'}
+                      alt={appt?.patientId?.name || appt?.patientId?.email || 'Patient'}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-medium">{appt?.patientId?.name || appt?.patientId?.email || 'Patient'}</p>
+                      <p className="text-sm text-gray-500">{formatDateTime(appt.dateTime)}</p>
+                    </div>
                   </div>
-                </div>
-                <button className="text-red-400 bg-red-100 px-2 py-1 rounded-full hover:bg-red-200">
-                  ✕
-                </button>
-              </li>
-            ))}
-          </ul>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">{appt.status}</span>
+                    <button
+                      onClick={() => updateStatus(appt._id, 'confirmed')}
+                      className="text-green-600 bg-green-100 px-2 py-1 rounded-full hover:bg-green-200"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      onClick={() => updateStatus(appt._id, 'completed')}
+                      className="text-blue-600 bg-blue-100 px-2 py-1 rounded-full hover:bg-blue-200"
+                    >
+                      Complete
+                    </button>
+                    <button
+                      onClick={() => updateStatus(appt._id, 'cancelled')}
+                      className="text-red-500 bg-red-100 px-2 py-1 rounded-full hover:bg-red-200"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </li>
+              ))}
+              {appointments.length === 0 && (
+                <li className="text-sm text-gray-500">No appointments found.</li>
+              )}
+            </ul>
+          )}
         </div>
       </main>
     </div>

@@ -59,21 +59,24 @@ const Signup = () => {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-      console.log('Signup response:', data);
+      const resJson = await response.json();
+      console.log('Signup response:', resJson);
 
       if (response.status === 201) {
-        alert('Signup successful! OTP sent to your email.');
+        const user = resJson.data;
+        localStorage.setItem('token', user.accessToken);
+        localStorage.setItem('role', user.role);
+        localStorage.setItem('email', user.email);
 
-        // ✅ Navigate to email-verification page with email & role in state
-        navigate('/email-verification', {
-          state: {
-            email: payload.email,
-            role: payload.role,
-          },
-        });
+        alert('Signup successful!');
+
+        if (user.role === 'doctor') {
+          navigate('/doctorsDashboard');
+        } else {
+          navigate('/PatientMainScreen');
+        }
       } else {
-        alert(data.message || 'Signup failed.');
+        alert(resJson.message || 'Signup failed.');
       }
     } catch (error) {
       console.error('Signup error:', error);

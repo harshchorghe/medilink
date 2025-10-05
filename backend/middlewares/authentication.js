@@ -1,70 +1,29 @@
-// const jwt = require("jsonwebtoken")
-
-// function verifyAccessToken(req, res, next) {
-//     try {
-//         if(req.headers.authorization == null) {
-//             throw "invalid access"
-//         }
-//         const verifiedData = jwt.verify(req.headers.authorization, process.env.SECRET)
-//         console.log("verify : ", verifiedData)
-
-//         req.userEmail = verifiedData.email 
-//         req.userRole = verifiedData.role
-//         req.userId = verifiedData._id
-//     } catch (error) {
-//         return res.status(403).json({
-//             message: "authentication failed",
-//             error: "invalid access",
-//             data: null
-//          })
-//     }
-//     next()
-// }
-
-// function checkIsPatient(req, res, next) {
-//     try {
-//         if(req.userRole != "patient") {
-//             throw "only patient can create appointment"
-//         }
-//     } catch (error) {
-//         return res.status(422).json({
-//             message: "unauthorized access",
-//             error: error,
-//             data: null
-//          })
-//     }
-//    next()
-// }
-
-// function checkIsDoctor(req, res, next) {
-//     try {
-//         if(req.userRole != "doctor") {
-//             throw "only doctor can update appointment"
-//         }
-//     } catch (error) {
-//         return res.status(422).json({
-//             message: "unauthorized access",
-//             error: error,
-//             data: null
-//          })
-//     }
-//    next()
-// }
-
-// module.exports = {
-//     verifyAccessToken,
-//     checkIsPatient,
-//     checkIsDoctor
-// }
-
 const jwt = require("jsonwebtoken");
 
 function verifyAccessToken(req, res, next) {
   try {
-    const token = req.headers.authorization;
-    if (!token) throw "Token missing";
+    const authHeader = req.headers.authorization || "";
+    let token = authHeader;
+    if (authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring("Bearer ".length).trim();
+    }
 
-    const verified = jwt.verify(token, process.env.SECRET);
+    if (!token) {
+      if (process.env.NODE_ENV !== "production") {
+        const mockEmail = req.headers["x-dev-user-email"]; // e.g., doctor@example.com
+        const mockRole = req.headers["x-dev-user-role"];   // e.g., doctor | patient
+        const mockId = req.headers["x-dev-user-id"];       // optional
+        if (mockEmail && mockRole) {
+          req.userEmail = mockEmail;
+          req.userRole = mockRole;
+          req.userId = mockId || undefined;
+          return next();
+        }
+      }
+      throw new Error("Token missing");
+    }
+
+    const verified = jwt.verify(token, process.env.SECRET || 'dev-secret');
     req.userEmail = verified.email;
     req.userRole = verified.role;
     req.userId = verified._id;

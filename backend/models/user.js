@@ -84,8 +84,6 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 
-const OtpModel = require("./EmailOtpVerification")
-
 const profileSchema = new mongoose.Schema({
     age: {
         type: Number,
@@ -112,10 +110,6 @@ const userSchema = new mongoose.Schema({
         required: true, 
         unique: true
     },
-    verifiedEmail: {
-        type: Boolean,
-        default: false
-    },
     password: {
         type: String, 
         required: true,
@@ -138,20 +132,6 @@ userSchema.pre("save", async function () {
     this.password = await bcrypt.hash(this.password, salt);
 })
 
-userSchema.post("save", async function() {
-    try {
-        return await OtpModel.create({
-            email: this.email,
-            otp: null,
-            hashedPassword: this.password,
-            name: this.name,
-            role: this.role
-        })
-    } catch { } // Avoid breaking on duplicate if already created manually
-})
-
-userSchema.post("findOneAndDelete", function() {
-    return OtpModel.deleteOne({ email: this.email })
-})
+// OTP flow removed
 
 module.exports = mongoose.model("User", userSchema)

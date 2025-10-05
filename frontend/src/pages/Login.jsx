@@ -16,12 +16,12 @@ const Login = ({ setIsLoggedIn }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/v1/auth/Login', {
+      const response = await fetch('http://localhost:5000/v1/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json' // Add 'Authorization' header if needed
         },
-        body: JSON.stringify({ email, password }) // Add role if required
+        body: JSON.stringify({ email, password, role })
       });
 
       const data = await response.json();
@@ -38,12 +38,10 @@ const Login = ({ setIsLoggedIn }) => {
         alert('Login successful!');
         
         // Redirect based on role
-        if (role === 'admin') {
-          navigate('/PatientMainScreen');
-        } else if (role === 'doctor') {
+        if (role === 'doctor') {
           navigate('/doctorsDashboard');
         } else {
-          navigate('/signup');
+          navigate('/PatientMainScreen');
         }
 
       } else {
