@@ -7,7 +7,7 @@ const formatDateTime = (epochMs) => {
   try {
     const d = new Date(Number(epochMs));
     return d.toLocaleString();
-  } catch (_) {
+  } catch  {
     return '';
   }
 };
@@ -18,6 +18,22 @@ const DashBoard = () => {
   const [error, setError] = useState('');
 
   const token = useMemo(() => localStorage.getItem('token') || '', []);
+
+  // Dummy appointments
+  const dummyAppointments = [
+    {
+      _id: 'dummy1',
+      patientId: { name: 'John Doe', avatar: 'https://i.pravatar.cc/100?img=1', email: 'john@example.com' },
+      dateTime: Date.now(),
+      status: 'pending'
+    },
+    {
+      _id: 'dummy2',
+      patientId: { name: 'Jane Smith', avatar: 'https://i.pravatar.cc/100?img=2', email: 'jane@example.com' },
+      dateTime: Date.now() + 3600000,
+      status: 'pending'
+    }
+  ];
 
   useEffect(() => {
     const controller = new AbortController();
@@ -40,10 +56,16 @@ const DashBoard = () => {
         if (!res.ok) {
           throw new Error(json?.error || json?.message || 'Failed to fetch appointments');
         }
-        setAppointments(Array.isArray(json.data) ? json.data : []);
+        // Combine API data with dummy appointments
+        setAppointments([
+          ...(Array.isArray(json.data) ? json.data : []),
+          ...dummyAppointments
+        ]);
       } catch (e) {
         if (e.name !== 'AbortError') {
           setError(e.message || 'Something went wrong');
+          // If error, show only dummy appointments
+          setAppointments(dummyAppointments);
         }
       } finally {
         setLoading(false);
